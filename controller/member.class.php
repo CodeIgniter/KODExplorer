@@ -30,10 +30,13 @@ class member extends Controller{
 
         $this->in['name'] = rawurldecode($this->in['name']);
         $this->in['password'] = rawurldecode($this->in['password']);
+        $this->in['path'] = rawurldecode($this->in['path']);
+
         $user = array(
             'name'      =>  rawurldecode($this->in['name']),
             'password'  =>  md5(rawurldecode($this->in['password'])),
             'role'      =>  $this->in['role'],
+            'path'      =>  $this->in['path'],
             'status'    =>  0,
         );
         if ($this->sql->add($this->in['name'],$user)) {
@@ -54,12 +57,15 @@ class member extends Controller{
         $this->in['name'] = rawurldecode($this->in['name']);
         $this->in['name_to'] = rawurldecode($this->in['name_to']);
         $this->in['password_to'] = rawurldecode($this->in['password_to']);
+        $this->in['path_to'] = rawurldecode($this->in['path_to']);
+
         if ($this->in['name'] == 'admin') show_json($this->L['default_user_can_not_do'],false);
 
         //查找到一条记录，修改为该数组
         $user = $this->sql->get($this->in['name']);
         $user['name'] = $this->in['name_to'];
         $user['role'] = $this->in['role_to'];
+        $user['path'] = $this->in['path_to'];
 
         if (strlen($this->in['password_to'])>=1) {
             $user['password'] = md5($this->in['password_to']);
