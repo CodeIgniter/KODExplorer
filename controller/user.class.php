@@ -37,6 +37,12 @@ class user extends Controller
             if (!file_exists(USER)) {
                 $this->logout();
             }
+
+            $this->config['user_share_file']   = USER.'data/share.php';    // 收藏夹文件存放地址.
+            $this->config['user_fav_file']     = USER.'data/fav.php';    // 收藏夹文件存放地址.
+            $this->config['user_seting_file']  = USER.'data/config.php'; //用户配置文件
+            $this->config['user']  = fileCache::load($this->config['user_seting_file']);
+
             if ($this->user['role'] == 'root') {
                 define('MYHOME',USER.'home/');
                 define('HOME','');
@@ -44,14 +50,23 @@ class user extends Controller
                 $GLOBALS['is_root'] = 1;
             }else{
                 define('MYHOME','/');
-                define('HOME',USER.'home/');
+
+                $member = new fileCache(USER_SYSTEM.'member.php');
+                $user = $member->get($this->user['name']);
+
+                if (!empty($user['path']))
+                {
+                    define('HOME', $user['path'].'/');
+                }
+                else
+                {
+                    define('HOME', USER.'home/');
+                }
+
                 $GLOBALS['web_root'] = str_replace(WEB_ROOT,'',HOME);//从服务器开始到用户目录
                 $GLOBALS['is_root'] = 0;
             }
-            $this->config['user_share_file']   = USER.'data/share.php';    // 收藏夹文件存放地址.
-            $this->config['user_fav_file']     = USER.'data/fav.php';    // 收藏夹文件存放地址.
-            $this->config['user_seting_file']  = USER.'data/config.php'; //用户配置文件
-            $this->config['user']  = fileCache::load($this->config['user_seting_file']);
+
             if($this->config['user']['theme']==''){
                 $this->config['user'] = $this->config['setting_default'];
             }
